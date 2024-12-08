@@ -58,7 +58,7 @@
                 <van-icon name="arrow" size="5rem" color="#b0dbda"/>
                 <div class="func-text">下一个</div>
             </van-col>
-            <van-col @click="router().back()">
+            <van-col v-if="kanaIndex > rangeList.length" @click="router().back()">
                 <van-icon name="revoke" size="5rem" color="#b0dbda"/>
                 <div class="func-text">返回</div>
             </van-col>
@@ -171,9 +171,7 @@ export default {
             if (kanaIndex >= rangeList.length) {
                 console.log('全部完成')
                 common.showTips('全部完成 !', 'success');
-                setTimeout(() => {
 
-                }, 1500)
             } else {
                 //还有
                 // 随机抽取4个假名
