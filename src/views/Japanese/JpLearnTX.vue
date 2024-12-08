@@ -1,7 +1,7 @@
 <template>
     <div class="JpLearn">
         <van-nav-bar
-            title="假名听写"
+            :title="this.kanaType === 1 ? '平假名听写':'片假名听写'"
             left-text="返回"
             left-arrow
             @click-left="router().back()"
@@ -57,6 +57,10 @@
             <van-col @click="next">
                 <van-icon name="arrow" size="5rem" color="#b0dbda"/>
                 <div class="func-text">下一个</div>
+            </van-col>
+            <van-col @click="router().back()">
+                <van-icon name="revoke" size="5rem" color="#b0dbda"/>
+                <div class="func-text">返回</div>
             </van-col>
         </van-row>
     </div>

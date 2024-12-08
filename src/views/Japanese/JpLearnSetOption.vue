@@ -48,29 +48,33 @@
             <van-field v-for="index in rowNum">
                 <template #left-icon>
                     <van-row gutter="28" justify="space-between">
-                        <van-col v-for="item in kanaList[index]"><div class="show-kana">{{kanaType === 1 ? item.Hiragana　: item.Katakana}}</div></van-col>
+                        <van-col v-for="item in kanaList[index]">
+                            <div class="show-kana">{{ kanaType === 1 ? item.Hiragana : item.Katakana }}</div>
+                        </van-col>
                     </van-row>
                 </template>
             </van-field>
         </van-cell-group>
 
-<!--        <div class="form-title">包含混淆</div>
-        <van-cell-group inset>
-            <van-cell center :title="obfuscation ? '是' : '否'">
-                <template #right-icon>
-                    <van-switch v-model="obfuscation"/>
-                </template>
-            </van-cell>
-        </van-cell-group>-->
+        <!--        <div class="form-title">包含混淆</div>
+                <van-cell-group inset>
+                    <van-cell center :title="obfuscation ? '是' : '否'">
+                        <template #right-icon>
+                            <van-switch v-model="obfuscation"/>
+                        </template>
+                    </van-cell>
+                </van-cell-group>-->
 
         <van-button round type="success" size="large" @click="goLearn" class="lock-to-bottom">Go!</van-button>
     </div>
 </template>
 
 <script>
-import {ref} from 'vue';
+import {ref, onMounted} from 'vue';
 import router from "../../router/router";
-import hanaList from "/src/config/kana.json";
+import kana from "/src/config/kana.json";
+import {useRoute} from 'vue-router';
+import common from "../../util/common";
 
 export default {
     name: 'JpLearnSetOption',
@@ -79,7 +83,21 @@ export default {
         const rowNum = ref(1);
         const quesType = ref(1);
         const obfuscation = ref(false);
-        const kanaList = ref(hanaList);
+        const kanaList = ref(kana);
+        const route = useRoute();
+        onMounted(() => {
+            //读取query
+            console.log(route.query)
+            if (route.query.kanaType) {
+                kanaType.value = Number(route.query.kanaType);
+            }
+            if (route.query.rowNum) {
+                rowNum.value = Number(route.query.rowNum);
+            }
+            if (route.query.quesType) {
+                quesType.value = Number(route.query.quesType);
+            }
+        });
 
         //去学习
         const goLearn = () => {
@@ -87,17 +105,27 @@ export default {
             if (quesType.value === 2) {
                 path = "/JpLearnTX";
             }
-            //跳转
-            router.push(
-                {
-                    path: path,
-                    query: {
-                        kanaType: kanaType.value,
-                        rowNum: rowNum.value,
-                        obfuscation: obfuscation.value,
-                    }
+            //将当前参数设置到query
+            router.push({
+                query: {
+                    kanaType: kanaType.value,
+                    rowNum: rowNum.value,
+                    quesType: quesType.value,
                 }
+            });
+            common.showTips('跳转中...','loading')
+            setTimeout(()=>{
+                router.push(
+                    {
+                        path: path,
+                        query: {
+                            kanaType: kanaType.value,
+                            rowNum: rowNum.value,
+                        }
+                    }
                 )
+            },800)
+            //跳转
         };
         return {
             //data
@@ -124,6 +152,7 @@ export default {
         /* 根据需要调整垂直对齐 */
         vertical-align: middle;
     }
+
     .show-kana {
         font-size: 17px;
         width: 18px;
