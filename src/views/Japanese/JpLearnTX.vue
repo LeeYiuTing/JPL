@@ -45,7 +45,7 @@
         </div>
 
         <!--功能区-->
-        <van-row class="lock-to-bottom" justify="center" gutter="70">
+        <van-row class="lock-to-bottom" justify="space-between">
             <van-col @click="onClear">
                 <van-icon name="replay" size="5rem" color="#b0dbda"/>
                 <div class="func-text">重写</div>
