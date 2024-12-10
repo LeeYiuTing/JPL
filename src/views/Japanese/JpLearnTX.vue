@@ -46,6 +46,10 @@
 
         <!--功能区-->
         <van-row class="lock-to-bottom" justify="space-between">
+            <van-col v-if="kanaIndex > rangeList.length" @click="router().back()">
+                <van-icon name="revoke" size="5rem" color="#b0dbda"/>
+                <div class="func-text">返回</div>
+            </van-col>
             <van-col @click="onClear">
                 <van-icon name="replay" size="5rem" color="#b0dbda"/>
                 <div class="func-text">重写</div>
@@ -57,10 +61,6 @@
             <van-col @click="next">
                 <van-icon name="arrow" size="5rem" color="#b0dbda"/>
                 <div class="func-text">下一个</div>
-            </van-col>
-            <van-col v-if="kanaIndex > rangeList.length" @click="router().back()">
-                <van-icon name="revoke" size="5rem" color="#b0dbda"/>
-                <div class="func-text">返回</div>
             </van-col>
         </van-row>
     </div>
@@ -102,17 +102,20 @@ export default {
     mounted() {
         let query = this.$route.query;
         console.log('query', query)
-        this.rowNum = Number(query.rowNum);
         this.kanaType = Number(query.kanaType);
-        this.learnNum = 5 * this.rowNum;
 
-        window.addEventListener('resize', this.updateCanvasSize);
+        let rowIndexList = query.rowIndex.split(',');
+        let targetKanaList = [];
+        rowIndexList.forEach(index=>{
+            index = Number(index);
+            targetKanaList.push(this.kanaList[index]);
+        })
+        this.kanaList = targetKanaList;
+
+        this.learnNum = 5 * this.rowNum;
         this.collectKana();
     },
-    beforeDestroy() {
-        window.removeEventListener('resize', this.updateCanvasSize);
-        this.$refs.signature.resize()
-    },
+
     methods: {
         router() {
             return router
@@ -132,13 +135,8 @@ export default {
          * 整理假名
          */
         collectKana() {
-            // 全部假名
-            let allKana = this.kanaList;
-            console.log(allKana)
-            //取出要学习的假名
             let targetList = [];
-            let rowList = allKana.slice(0, this.rowNum)
-            rowList.forEach(row=>{
+            this.kanaList.forEach(row=>{
                 row.forEach(item=>{
                     if (item.Hiragana) {
                         targetList.push(item);
@@ -174,7 +172,6 @@ export default {
 
             } else {
                 //还有
-                // 随机抽取4个假名
                 this.target = rangeList[kanaIndex];
                 this.kanaIndex = kanaIndex + 1;
 
@@ -195,14 +192,6 @@ export default {
                 console.log('音频播放错误',error)
                 common.showTips('首次请手动点击播放', 'success');
             });
-        },
-
-        //绘画相关
-        // 监听窗口大小变化
-        updateCanvasSize() {
-            const layout = this.$el.querySelector('.canvas-layout');
-            this.canvasWidth = layout.clientWidth;
-            this.canvasHeight = layout.clientHeight;
         },
 
         //end
@@ -253,8 +242,12 @@ export default {
     /* 父容器的样式 */
 
     .canvas-container {
-        position: fixed;               /* 使用 fixed 定位 */
-        bottom: 120px;                  /* 底部贴边，距离 */
+        position: fixed;               /* 使用固定定位 */
+        bottom: 120px;                 /* 距离页面底部 120px */
+        left: 0;                       /* 默认左对齐，可调整 */
+        right: 0;                      /* 默认右对齐，可调整 */
+
+
         display: flex;                 /* 使用 Flexbox 布局 */
         justify-content: center;       /* 水平居中 */
         align-items: center;           /* 垂直居中 */

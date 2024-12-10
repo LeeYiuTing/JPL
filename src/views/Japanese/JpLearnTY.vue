@@ -66,6 +66,14 @@ export default {
         this.kanaType = Number(query.kanaType);
         this.learnNum = 5 * this.rowNum;
 
+        let rowIndexList = query.rowIndex.split(',');
+        let targetKanaList = [];
+        rowIndexList.forEach(index=>{
+            index = Number(index);
+            targetKanaList.push(this.kanaList[index]);
+        })
+        this.kanaList = targetKanaList;
+
         this.collectKana();
     },
     methods: {
@@ -82,8 +90,7 @@ export default {
 
             //取出要学习的假名
             let targetList = [];
-            let rowList = allKana.slice(0, this.rowNum)
-            rowList.forEach(row=>{
+            allKana.forEach(row=>{
                 row.forEach(item=>{
                     if (item.Hiragana) {
                         targetList.push(item);
